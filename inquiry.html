@@ -60,19 +60,29 @@
 </div>
 
 <script>
-  // 농가 식별: 뷰어가 ?farm=<주소> 로 열어줌 → 제목/본문에 포함
   (function(){
-    var params = new URLSearchParams(location.search);
-    var farm = params.get('farm') || '';
+    var p = new URLSearchParams(location.search);
+    var farm = p.get('farm') || '';
     if(farm){
       document.getElementById('f_subject').value = '[양액기 뷰어 문의] ' + farm;
       document.getElementById('f_farm').value = farm;
     }
-    // 전송 후 이 페이지로 복귀(?sent=1) → 완료 화면
-    document.getElementById('f_next').value = location.href.split('#')[0].split('?')[0] + '?sent=1' + (farm ? '&farm=' + encodeURIComponent(farm) : '');
+    document.getElementById('f_next').value = location.href.split('#')[0].split('?')[0] + '?sent=1';
+
+    // 전송 완료 복귀(?sent=1): 완료 화면 + (뷰어가 숨은 프레임으로 띄운 경우) 부모 창에 완료 알림
     if(/[?&]sent=1/.test(location.search)){
       document.getElementById('form').classList.add('hide');
       document.getElementById('done').classList.remove('hide');
+      try { if(window.parent && window.parent !== window) window.parent.postMessage('inquiry-sent', '*'); } catch(e){}
+      return;
+    }
+
+    // 자동 제출: 뷰어 인앱 폼이 ?auto=1&content=...&contact=... 로 데이터를 넘기면 같은 출처에서 자동 발송.
+    var content = p.get('content'), contact = p.get('contact');
+    if(p.get('auto') === '1' && content){
+      document.getElementById('content').value = content;
+      document.getElementById('contact').value = contact || '';
+      setTimeout(function(){ document.getElementById('form').submit(); }, 60);
     }
   })();
 </script>

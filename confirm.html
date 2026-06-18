@@ -150,10 +150,50 @@
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   function val(id){ var el=document.getElementById(id); return el ? String(el.value).trim() : ''; }
   function pad(n){ return String(n).padStart(2,'0'); }
   function setMsg(text, ok){ var m=document.getElementById('sendMsg'); m.textContent=text; m.style.color = ok ? '#15803d' : '#b91c1c'; }
+
+  // 작성된 확인서를 화면 그대로 PDF(Blob)로 생성 — 입력칸은 값 텍스트로 치환, 버튼 등 no-print 제거.
+  async function buildConfirmPdf(){
+    var sheet = document.querySelector('.sheet');
+    var clone = sheet.cloneNode(true);
+    clone.querySelectorAll('.no-print').forEach(function(el){ el.parentNode && el.parentNode.removeChild(el); });
+    clone.querySelectorAll('input').forEach(function(inp){
+      var span = document.createElement('span');
+      span.textContent = (inp.value || '').toString();
+      span.style.fontWeight = '700';
+      inp.parentNode.replaceChild(span, inp);
+    });
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:-10000px;top:0;width:' + sheet.offsetWidth + 'px;background:#fff;';
+    clone.style.margin = '0';
+    wrap.appendChild(clone);
+    document.body.appendChild(wrap);
+    try {
+      var canvas = await html2canvas(clone, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: sheet.offsetWidth });
+      var imgData = canvas.toDataURL('image/jpeg', 0.92);
+      var JsPDF = window.jspdf.jsPDF;
+      var pdf = new JsPDF('p', 'mm', 'a4');
+      var pageW = 210, pageH = 297;
+      var imgH = canvas.height * pageW / canvas.width;
+      var heightLeft = imgH, position = 0;
+      pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) {
+        position = heightLeft - imgH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+        heightLeft -= pageH;
+      }
+      return pdf.output('blob');
+    } finally {
+      document.body.removeChild(wrap);
+    }
+  }
 
   // 작성일 기본값 = 오늘 (수정 가능)
   (function(){
@@ -162,7 +202,7 @@
     if(y) y.value=t.getFullYear(); if(m) m.value=t.getMonth()+1; if(d) d.value=t.getDate();
   })();
 
-  function submitConfirm(){
+  async function submitConfirm(){
     var farm=val('f_farm'), owner=val('f_owner'), phone=val('f_phone'), addr=val('f_addr');
     if(!document.getElementById('f_agree').checked){ setMsg('동의 체크가 필요합니다', false); return; }
     if(!farm || !owner){ setMsg('농가명과 대표자명을 입력하세요', false); return; }
@@ -173,31 +213,39 @@
     var writeDate=(wy&&wm&&wd) ? (wy+'-'+pad(wm)+'-'+pad(wd)) : '(미입력)';
 
     var btn=document.getElementById('sendBtn');
-    btn.disabled=true; setMsg('전송 중…', true);
+    btn.disabled=true;
 
-    // Formsubmit.co (무료·무제한, 외부 폼 서비스) 로 전송 → 뷰어/서버 불필요, 어디서 열어도 동작.
-    // 항목을 구조화해 보냄(_template: table). 최초 1회 전송 시 회사 메일로 활성화 메일이 오며,
-    // 그 링크를 한 번 클릭해야 이후 메일이 정상 수신됨.
-    var payload = {
-      _subject: '[테스트운영 확인서] ' + farm,
-      '농가명': farm,
-      '대표자명(전자서명)': owner,
-      '연락처': phone || '(미입력)',
-      '주소': addr || '(미입력)',
-      '동의': '예 (위 확인서 내용에 동의)',
-      '작성일': writeDate,
-      '전송일시': ts,
-      _template: 'table',
-      _captcha: 'false'
-    };
-    fetch('https://formsubmit.co/ajax/phg@wsh.co.kr', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function(r){ return r.json(); })
+    // 1) 작성된 확인서를 화면 그대로 PDF 로 생성 (실패해도 항목만으로 전송)
+    var pdfBlob = null;
+    try { setMsg('확인서를 PDF로 만드는 중…', true); pdfBlob = await buildConfirmPdf(); }
+    catch(e){ pdfBlob = null; }
+
+    // 2) Formsubmit.co (무료·무제한) 로 전송 — PDF 첨부 + 작성 항목. 뷰어/서버 불필요.
+    //    최초 1회 전송 시 회사 메일로 활성화 메일이 오며, 그 링크를 한 번 클릭해야 이후 정상 수신.
+    setMsg('전송 중…', true);
+    var fd = new FormData();
+    fd.append('_subject', '[테스트운영 확인서] ' + farm);
+    fd.append('농가명', farm);
+    fd.append('대표자명(전자서명)', owner);
+    fd.append('연락처', phone || '(미입력)');
+    fd.append('주소', addr || '(미입력)');
+    fd.append('동의', '예 (위 확인서 내용에 동의)');
+    fd.append('작성일', writeDate);
+    fd.append('전송일시', ts);
+    fd.append('_template', 'table');
+    fd.append('_captcha', 'false');
+    if(pdfBlob){ fd.append('attachment', pdfBlob, '테스트운영확인서_' + farm + '.pdf'); }
+
+    fetch('https://formsubmit.co/ajax/phg@wsh.co.kr', { method:'POST', body: fd })
+      .then(function(r){ return r.json(); })
       .then(function(d){
-        if(d && (d.success === 'true' || d.success === true)){ setMsg('✔ 전송되었습니다. 감사합니다.', true); }
-        else { btn.disabled=false; setMsg('전송 실패: '+((d&&d.message)||'잠시 후 다시 시도')+' — 안되면 [인쇄/PDF 저장] 후 보내주세요.', false); }
+        if(d && (d.success === 'true' || d.success === true)){
+          setMsg(pdfBlob ? '✔ 전송되었습니다 (확인서 PDF 첨부). 감사합니다.' : '✔ 전송되었습니다. 감사합니다.', true);
+        } else if(d && d.message && /activ/i.test(d.message)){
+          btn.disabled=false; setMsg('첫 전송입니다 — 회사(phg@wsh.co.kr) 메일의 활성화 링크를 1회 클릭하면 이후 정상 수신됩니다.', false);
+        } else {
+          btn.disabled=false; setMsg('전송 실패: '+((d&&d.message)||'잠시 후 다시 시도')+' — 안되면 [인쇄/PDF 저장] 후 보내주세요.', false);
+        }
       })
       .catch(function(){
         btn.disabled=false;

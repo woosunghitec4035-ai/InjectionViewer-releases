@@ -220,38 +220,59 @@
     try { setMsg('확인서를 PDF로 만드는 중…', true); pdfBlob = await buildConfirmPdf(); }
     catch(e){ pdfBlob = null; }
 
-    // 2) Formsubmit.co (무료·무제한) 로 전송 — PDF 첨부 + 작성 항목. 뷰어/서버 불필요.
-    //    최초 1회 전송 시 회사 메일로 활성화 메일이 오며, 그 링크를 한 번 클릭해야 이후 정상 수신.
-    setMsg('전송 중…', true);
-    var fd = new FormData();
-    fd.append('_subject', '[테스트운영 확인서] ' + farm);
-    fd.append('농가명', farm);
-    fd.append('대표자명(전자서명)', owner);
-    fd.append('연락처', phone || '(미입력)');
-    fd.append('주소', addr || '(미입력)');
-    fd.append('동의', '예 (위 확인서 내용에 동의)');
-    fd.append('작성일', writeDate);
-    fd.append('전송일시', ts);
-    fd.append('_template', 'table');
-    fd.append('_captcha', 'false');
-    if(pdfBlob){ fd.append('attachment', pdfBlob, '테스트운영확인서_' + farm + '.pdf'); }
+    if(!pdfBlob){
+      btn.disabled=false;
+      setMsg('PDF 생성에 실패했습니다. 인터넷 연결을 확인하거나 [인쇄/PDF 저장] 후 보내주세요.', false);
+      return;
+    }
 
-    fetch('https://formsubmit.co/ajax/phg@wsh.co.kr', { method:'POST', body: fd })
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(d && (d.success === 'true' || d.success === true)){
-          setMsg(pdfBlob ? '✔ 전송되었습니다 (확인서 PDF 첨부). 감사합니다.' : '✔ 전송되었습니다. 감사합니다.', true);
-        } else if(d && d.message && /activ/i.test(d.message)){
-          btn.disabled=false; setMsg('첫 전송입니다 — 회사(phg@wsh.co.kr) 메일의 활성화 링크를 1회 클릭하면 이후 정상 수신됩니다.', false);
-        } else {
-          btn.disabled=false; setMsg('전송 실패: '+((d&&d.message)||'잠시 후 다시 시도')+' — 안되면 [인쇄/PDF 저장] 후 보내주세요.', false);
-        }
-      })
-      .catch(function(){
-        btn.disabled=false;
-        setMsg('전송 실패 — 인터넷 연결을 확인해 주세요. 계속 안되면 [인쇄/PDF 저장] 후 보내주세요.', false);
-      });
+    // 2) PDF 첨부는 ajax 로는 무시됨 → "정식 폼 제출"로 전송(파일 첨부 정상).
+    //    생성한 PDF 를 DataTransfer 로 file input 에 넣고 폼 submit → Formsubmit 이 첨부 처리.
+    //    제출 후 _next 로 이 페이지(?sent=1)로 돌아옴.
+    setMsg('전송 중… 잠시 화면이 이동했다 돌아옵니다.', true);
+    try {
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://formsubmit.co/phg@wsh.co.kr';
+      form.enctype = 'multipart/form-data';
+      form.style.display = 'none';
+      function add(n, v){ var i=document.createElement('input'); i.type='hidden'; i.name=n; i.value=v; form.appendChild(i); }
+      add('_subject', '[테스트운영 확인서] ' + farm);
+      add('농가명', farm);
+      add('대표자명(전자서명)', owner);
+      add('연락처', phone || '(미입력)');
+      add('주소', addr || '(미입력)');
+      add('동의', '예 (위 확인서 내용에 동의)');
+      add('작성일', writeDate);
+      add('전송일시', ts);
+      add('_template', 'table');
+      add('_captcha', 'false');
+      add('_next', location.href.split('#')[0].split('?')[0] + '?sent=1');
+
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file'; fileInput.name = 'attachment';
+      var dt = new DataTransfer();
+      dt.items.add(new File([pdfBlob], '테스트운영확인서_' + farm + '.pdf', { type:'application/pdf' }));
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    } catch(e){
+      btn.disabled=false;
+      setMsg('전송 실패 — 이 브라우저가 첨부를 지원하지 않습니다. [인쇄/PDF 저장] 후 보내주세요.', false);
+    }
   }
+
+  // 제출 후 돌아왔을 때(_next ?sent=1) 완료 안내
+  (function(){
+    if(/[?&]sent=1/.test(location.search)){
+      try { alert('✔ 테스트 운영 확인서가 전송되었습니다. 감사합니다.'); } catch(e){}
+      window.addEventListener('DOMContentLoaded', function(){
+        var m=document.getElementById('sendMsg'); if(m){ m.textContent='✔ 전송 완료 — 감사합니다.'; m.style.color='#15803d'; }
+      });
+    }
+  })();
 </script>
 </body>
 </html>

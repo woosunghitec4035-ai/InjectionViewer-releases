@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>양액기 모니터링 시스템(InjectionViewer) 테스트 운영 확인서</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+  :root{ --ink:#1f2937; --green-dark:#1a4731; --green-mid:#2d7a4f; --green-pale:#e8f5ee; --line:#cfd6dd; --gray:#6b7280; --gray-50:#f9fafb; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:'Noto Sans KR','Malgun Gothic',sans-serif; color:var(--ink); background:#eef1f4; font-size:13.5px; line-height:1.75; }
+  .sheet{ max-width:840px; margin:24px auto; background:#fff; padding:44px 54px 40px; box-shadow:0 2px 14px rgba(0,0,0,.08); }
+  .doc-top{ text-align:center; border-bottom:3px solid var(--green-dark); padding-bottom:16px; margin-bottom:18px; }
+  .doc-brand{ color:var(--green-mid); font-weight:800; font-size:12px; letter-spacing:1px; }
+  h1{ font-size:23px; font-weight:900; margin:7px 0 3px; letter-spacing:-.02em; }
+  .doc-sub{ font-size:12px; color:var(--gray); }
+  .intro{ background:var(--green-pale); border:1px solid #bfe3cf; border-radius:8px; padding:12px 15px; font-size:13px; margin-bottom:18px; }
+  h2{ font-size:14.5px; font-weight:800; color:var(--green-dark); margin:18px 0 6px; }
+  .art p{ margin:3px 0 3px 0; }
+  .art .item{ display:flex; gap:7px; margin:3px 0; }
+  .art .item .n{ color:var(--green-mid); font-weight:700; flex-shrink:0; }
+  ul.dash{ list-style:none; margin:4px 0 4px 4px; }
+  ul.dash li{ position:relative; padding-left:14px; margin:2px 0; }
+  ul.dash li::before{ content:'•'; position:absolute; left:0; color:var(--green-mid); }
+  .flow{ background:var(--gray-50); border:1px solid var(--line); border-radius:8px; padding:10px 14px; font-size:12.5px; font-weight:600; color:#374151; margin:6px 0; line-height:1.9; }
+  .ph{ color:#b45309; font-weight:700; }
+  table.sign{ width:100%; border-collapse:collapse; margin:8px 0; }
+  table.sign th, table.sign td{ border:1px solid var(--line); padding:9px 12px; font-size:13px; }
+  table.sign th{ background:var(--gray-50); width:120px; text-align:left; }
+  .date-line{ text-align:center; margin:22px 0 14px; font-size:15px; letter-spacing:1px; }
+  .date-line .dateInput{ font-family:inherit; font-size:15px; text-align:center; border:none; border-bottom:1px solid var(--line); background:transparent; color:var(--ink); padding:1px 2px; }
+  .date-line .dateInput:focus{ outline:none; border-bottom-color:var(--green-mid); }
+  .sign-cols{ display:flex; gap:18px; }
+  .sign-cols > div{ flex:1; }
+  .sign-cols h3{ font-size:13px; margin-bottom:6px; color:var(--green-dark); }
+  .footer{ text-align:center; color:var(--gray); font-size:12px; margin-top:22px; border-top:1px solid var(--line); padding-top:10px; }
+  table.sign td input{ width:100%; border:none; outline:none; font-family:inherit; font-size:13px; color:var(--ink); background:transparent; padding:2px 0; }
+  table.sign td input::placeholder{ color:#b9c0c8; }
+  .agree{ display:flex; gap:8px; align-items:flex-start; margin:12px 0 4px; font-size:13px; background:var(--green-pale); border:1px solid #bfe3cf; border-radius:8px; padding:11px 13px; cursor:pointer; }
+  .agree input{ margin-top:3px; width:16px; height:16px; flex-shrink:0; }
+  .send-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:14px 0 4px; }
+  .send-row button{ font-family:inherit; font-size:14px; font-weight:700; padding:10px 18px; border-radius:8px; border:1px solid var(--green-mid); cursor:pointer; }
+  .send-row button.primary{ background:var(--green-mid); color:#fff; }
+  .send-row button.ghost{ background:#fff; color:var(--green-dark); }
+  .send-row button:disabled{ opacity:.6; cursor:default; }
+  #sendMsg{ font-size:13px; font-weight:700; }
+  .send-note{ font-size:12px; color:var(--gray); margin-top:4px; }
+  @media print{ body{ background:#fff; } .sheet{ box-shadow:none; margin:0; max-width:none; padding:12mm 14mm; } .no-print{ display:none !important; } @page{ size:A4; margin:0; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="doc-top">
+    <div class="doc-brand">㈜우성하이텍 · 양액기 모니터링 시스템</div>
+    <h1>테스트 운영 확인서</h1>
+    <div class="doc-sub">InjectionViewer Pilot Operation Agreement</div>
+  </div>
+
+  <div class="intro">
+    본 확인서는 <strong>㈜우성하이텍</strong>이 제공하는 양액기 모니터링 시스템 <strong>"InjectionViewer"</strong>의 테스트 운영과 관련하여 제공 범위·유의사항 및 <strong>회사와 사용자의 책임 범위</strong>를 사전에 안내하고 상호 확인하기 위하여 작성됩니다.
+  </div>
+
+  <div class="art">
+    <h2>제1조 (목적 및 용어의 정의)</h2>
+    <div class="item"><span class="n">①</span><span><strong>"InjectionViewer"</strong>(이하 "시스템")는 양액공급기 및 컨트롤러와 연동하여 모니터링 및 제어 기능을 제공하며, 농가 PC에 설치되어 동작하고 외부에서는 인터넷을 통해 접속할 수 있는 소프트웨어를 말합니다.</span></div>
+    <div class="item"><span class="n">②</span><span>"회사"는 시스템을 제공하는 <strong>㈜우성하이텍</strong>을, "사용자"는 본 확인서에 서명하고 테스트 운영에 참여하는 농가 또는 그 대표자를 말합니다.</span></div>
+    <div class="item"><span class="n">③</span><span>본 서비스는 실제 농가 환경에서 사용성·안정성·통신 상태·기능 개선 사항 등을 확인하기 위한 테스트(파일럿) 운영 목적으로 제공됩니다.</span></div>
+
+    <h2>제2조 (테스트 운영 기간)</h2>
+    <div class="item"><span class="n">①</span><span>테스트 운영 기간은 회사와 사용자가 협의하여 정하며, 협의하여 연장 또는 종료할 수 있습니다.</span></div>
+
+    <h2>제3조 (통신 구조 및 서비스 제공 범위)</h2>
+    <div class="item"><span class="n">①</span><span>시스템의 기본 통신 구조는 다음과 같습니다.</span></div>
+    <div class="flow">양액공급기 / 컨트롤러 &nbsp;→&nbsp; (유선 LAN) &nbsp;→&nbsp; 농가 PC (InjectionViewer 뷰어·웹서버) &nbsp;→&nbsp; Cloudflare 터널 &nbsp;→&nbsp; 인터넷 &nbsp;→&nbsp; 외부 (웹·모바일 앱)</div>
+    <div class="item"><span class="n">②</span><span>사용자는 현장(같은 네트워크)에서 장비 상태를 실시간 확인·제어할 수 있으며, 인터넷이 연결된 경우 외부에서도 접속할 수 있습니다.</span></div>
+    <div class="item"><span class="n">③</span><span>외부(원격) 접속 기능은 농가 PC·공유기·인터넷 및 통신 상태·외부 서비스(Cloudflare 등) 상태·장비 전원 및 케이블 연결 상태 등 다수의 외부 요소에 영향을 받으며, 회사가 통제할 수 없는 사용자 환경 또는 제3자 통신망·서비스에 기인한 장애에 대해서는 회사가 그 작동을 보장하지 않습니다.</span></div>
+
+    <h2>제4조 (테스트 운영 서비스의 특성 및 사용자 인지)</h2>
+    <p>본 서비스는 테스트 운영 단계이므로, 이용 중 다음과 같은 상황이 발생할 수 있습니다.</p>
+    <ul class="dash">
+      <li>서버 장애, 인터넷 또는 공유기 통신 장애, 일시적 접속 불가</li>
+      <li>원격 접속·제어 지연 또는 실패, 데이터 표시 오류</li>
+      <li>펌웨어 장비(양액공급기·컨트롤러)와 PC 간 통신 오류</li>
+      <li>기능 변경·업데이트로 인한 일시적 불편 또는 화면·메뉴·기능·사용 방식의 변경</li>
+    </ul>
+    <p>회사는 위와 같은 문제가 발생하지 않도록 최선을 다하여 관리·조치합니다. 다만 테스트 운영 서비스의 특성상 모든 기능의 완전하고 안정적인 작동을 보장하지는 못하며, 사용자는 테스트 기간 중 일시적 오류 또는 장애가 발생할 수 있음을 사전에 인지하고 이에 동의합니다.</p>
+
+    <h2>제5조 (화면 및 기능 변경)</h2>
+    <div class="item"><span class="n">①</span><span>시스템의 화면 구성·메뉴·기능 및 사용 방식은 서비스 개선, 오류 수정, 보안 강화 등을 위하여 변경될 수 있으며(자동 업데이트 포함), 이 과정에서 일시적으로 접속 또는 일부 기능 사용이 제한될 수 있습니다.</span></div>
+    <div class="item"><span class="n">②</span><span>회사는 변경 또는 점검이 예정된 경우 사전에 안내하는 것을 원칙으로 합니다. 다만 긴급한 오류 수정, 서버 장애 대응, 보안 조치 등 부득이한 경우에는 사전 안내 없이 조치할 수 있으며, 조치 후 별도로 안내할 수 있습니다.</span></div>
+
+    <h2>제6조 (원격(외부) 접속 장애 시 현장(로컬) 사용)</h2>
+    <div class="item"><span class="n">①</span><span>외부(원격) 접속이 일시적으로 불가능한 경우에도, 사용자는 <strong>현장(같은 네트워크)에서 시스템에 접속</strong>하거나 양액공급기·컨트롤러에 내장된 자체(로컬) 제어 기능을 통해 직접 제어할 수 있습니다.</span></div>
+    <div class="item"><span class="n">②</span><span>따라서 서버·인터넷·공유기·외부 서비스 통신 장애, 원격 접속 지연 또는 불가 등이 발생한 경우, 사용자는 현장 장비 및 로컬 접속을 이용하여 필요한 조치를 직접 진행하여야 합니다.</span></div>
+    <div class="item"><span class="n">③</span><span>사용자는 원격 접속이 불가능한 상황이 발생할 수 있음을 인지하고, 작물 관리에 영향을 줄 수 있는 핵심 동작(급수·관수·환경 제어 등)에 대하여 원격에만 의존하지 아니하며, 필요한 경우 현장에서 직접 장비를 확인·조작할 책임이 사용자에게 있음을 확인합니다.</span></div>
+
+    <h2>제7조 (사용자의 협조 및 준수 사항)</h2>
+    <div class="item"><span class="n">①</span><span>사용자는 테스트 운영 기간 동안 발생하는 오류·불편 사항·개선 요청·통신 장애·화면 표시 오류·원격 접속 이상 여부 등을 회사에 알려 서비스 개선에 협조합니다.</span></div>
+    <div class="item"><span class="n">②</span><span>사용자는 양액공급기·컨트롤러·PC·공유기·통신 케이블·전원 상태 등을 임의로 변경·분리·이전하기 전에 회사에 사전 문의합니다. 사용자의 임의 변경 또는 부주의로 발생한 장애·손상에 대하여는 회사가 책임을 지지 않습니다.</span></div>
+    <div class="item"><span class="n">③</span><span>사용자는 회사가 설치한 시스템 소프트웨어 및 설정을 회사의 사전 동의 없이 임의로 변경·삭제·역설계하지 않습니다.</span></div>
+    <div class="item"><span class="n">④</span><span>원격 접속 이상 또는 통신 장애 발생 시 사용자는 회사의 안내에 따라 기본적인 확인 절차(전원·케이블·공유기·인터넷 상태 확인 등)에 협조합니다.</span></div>
+
+    <h2>제8조 (데이터 및 개인정보의 활용)</h2>
+    <div class="item"><span class="n">①</span><span>테스트 운영 기간 중 발생한 오류 내용·사용 의견·개선 요청·접속 기록·작동 기록·통신 상태 등은 시스템의 안정화와 기능 개선을 위하여 활용될 수 있으며, 사용자는 이에 동의합니다.</span></div>
+    <div class="item"><span class="n">②</span><span>회사는 사용자가 제공한 연락처 등 개인정보를 테스트 운영 및 서비스 안내 목적 범위 내에서만 이용하며, 관련 법령에 따라 보호·관리합니다. 사용자는 개인정보의 수집·이용에 동의하며, 동의 철회 시 일부 기능 제공이 제한될 수 있습니다.</span></div>
+
+    <h2>제9조 (면책 및 책임의 한계)</h2>
+    <div class="item"><span class="n">①</span><span>본 서비스는 테스트 운영 서비스이므로, 서버 장애·통신 장애·원격 접속 지연 또는 오류·업데이트 및 점검으로 인한 일시적 사용 제한 등이 발생할 수 있습니다. 회사는 이러한 사유로 인하여 사용자에게 발생한 손해에 대하여 원칙적으로 배상 책임을 부담하지 아니합니다.</span></div>
+    <div class="item"><span class="n">②</span><span>특히 회사는 원격 접속·제어 장애·지연·오류 또는 데이터 표시 오류로 인하여 발생할 수 있는 작물 피해·생육 손실·영농상의 일실이익 등 간접적·결과적 손해에 대하여 책임을 지지 않습니다. 사용자는 제6조에 따라 현장(로컬) 사용으로 대응할 수 있음을 인지합니다.</span></div>
+    <div class="item"><span class="n">③</span><span>다만 위 각 항에도 불구하고, 회사의 고의 또는 중대한 과실로 인하여 사용자에게 손해가 발생한 경우에는 관련 법령이 정하는 범위에서 회사가 책임을 부담합니다.</span></div>
+
+    <h2>제10조 (지식재산권 및 비밀유지)</h2>
+    <div class="item"><span class="n">①</span><span>InjectionViewer 시스템 및 관련 소프트웨어·디자인·문서에 대한 일체의 지식재산권은 회사에 귀속됩니다. 사용자는 회사의 사전 동의 없이 이를 복제·역설계·재배포하지 않습니다.</span></div>
+    <div class="item"><span class="n">②</span><span>사용자는 테스트 운영 과정에서 알게 된 미공개 기능·가격 정책·기술 정보 등을 제3자에게 누설하지 않습니다.</span></div>
+
+    <h2>제11조 (기타)</h2>
+    <div class="item"><span class="n">①</span><span>본 확인서에 명시되지 않은 사항은 관계 법령 및 상관례에 따르며, 회사와 사용자가 신의성실의 원칙에 따라 협의하여 처리합니다.</span></div>
+    <div class="item"><span class="n">②</span><span>본 확인서의 해석 또는 이행과 관련하여 분쟁이 발생한 경우, 회사와 사용자는 상호 원만한 해결을 위하여 노력하며, 협의가 이루어지지 않을 경우 관련 법령이 정하는 절차에 따릅니다.</span></div>
+
+    <h2>제12조 (상호 확인 및 서명)</h2>
+    <p>회사와 사용자는 본 확인서의 내용을 충분히 읽고 이해하였으며, InjectionViewer 시스템이 테스트 운영 목적으로 제공된다는 점, 그리고 원격(외부) 접속 장애 시 사용자가 현장(로컬) 사용으로 대응하여야 한다는 점을 상호 확인합니다.</p>
+  </div>
+
+  <div class="date-line">작성일 <input id="f_y" class="dateInput" type="number" inputmode="numeric" style="width:64px;">년 <input id="f_m" class="dateInput" type="number" inputmode="numeric" min="1" max="12" style="width:44px;">월 <input id="f_d" class="dateInput" type="number" inputmode="numeric" min="1" max="31" style="width:44px;">일</div>
+
+  <div class="sign-single">
+    <h3 style="font-size:14px;color:var(--green-dark);margin-bottom:6px;">■ 사용자 (농가) 작성</h3>
+    <table class="sign">
+      <tr><th>농가명</th><td><input id="f_farm" placeholder="농가명을 입력하세요" autocomplete="off"></td></tr>
+      <tr><th>대표자명 (서명)</th><td><input id="f_owner" placeholder="대표자 성함 (전자서명)" autocomplete="off"></td></tr>
+      <tr><th>연락처</th><td><input id="f_phone" placeholder="휴대전화 또는 이메일" autocomplete="off"></td></tr>
+      <tr><th>주소</th><td><input id="f_addr" placeholder="설치 주소" autocomplete="off"></td></tr>
+    </table>
+
+    <label class="agree no-print">
+      <input type="checkbox" id="f_agree">
+      <span>위 확인서 내용을 충분히 읽고 이해하였으며, 본인(농가)이 직접 작성하여 전송함에 동의합니다. <b>(전자적 동의 — 작성·전송 시점이 함께 기록됩니다)</b></span>
+    </label>
+
+    <div class="send-row no-print">
+      <button class="primary" id="sendBtn" onclick="submitConfirm()">📧 작성 내용 회사로 전송</button>
+      <button class="ghost" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+      <span id="sendMsg"></span>
+    </div>
+    <p class="send-note no-print">※ <b>뷰어가 설치된 PC에서</b> 작성·전송하면 회사로 자동 접수됩니다. 전송이 안 되면 [인쇄/PDF 저장] 후 보내주세요.</p>
+  </div>
+
+  <div class="footer">본 확인서는 농가가 작성·전송하여 회사가 접수·보관합니다. · ㈜우성하이텍 · InjectionViewer</div>
+
+</div>
+
+<script>
+  function val(id){ var el=document.getElementById(id); return el ? String(el.value).trim() : ''; }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function setMsg(text, ok){ var m=document.getElementById('sendMsg'); m.textContent=text; m.style.color = ok ? '#15803d' : '#b91c1c'; }
+
+  // 작성일 기본값 = 오늘 (수정 가능)
+  (function(){
+    var t=new Date();
+    var y=document.getElementById('f_y'), m=document.getElementById('f_m'), d=document.getElementById('f_d');
+    if(y) y.value=t.getFullYear(); if(m) m.value=t.getMonth()+1; if(d) d.value=t.getDate();
+  })();
+
+  function submitConfirm(){
+    var farm=val('f_farm'), owner=val('f_owner'), phone=val('f_phone'), addr=val('f_addr');
+    if(!document.getElementById('f_agree').checked){ setMsg('동의 체크가 필요합니다', false); return; }
+    if(!farm || !owner){ setMsg('농가명과 대표자명을 입력하세요', false); return; }
+
+    var now=new Date();
+    var ts=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes());
+    var wy=val('f_y'), wm=val('f_m'), wd=val('f_d');
+    var writeDate=(wy&&wm&&wd) ? (wy+'-'+pad(wm)+'-'+pad(wd)) : '(미입력)';
+
+    var btn=document.getElementById('sendBtn');
+    btn.disabled=true; setMsg('전송 중…', true);
+
+    // Formsubmit.co (무료·무제한, 외부 폼 서비스) 로 전송 → 뷰어/서버 불필요, 어디서 열어도 동작.
+    // 항목을 구조화해 보냄(_template: table). 최초 1회 전송 시 회사 메일로 활성화 메일이 오며,
+    // 그 링크를 한 번 클릭해야 이후 메일이 정상 수신됨.
+    var payload = {
+      _subject: '[테스트운영 확인서] ' + farm,
+      '농가명': farm,
+      '대표자명(전자서명)': owner,
+      '연락처': phone || '(미입력)',
+      '주소': addr || '(미입력)',
+      '동의': '예 (위 확인서 내용에 동의)',
+      '작성일': writeDate,
+      '전송일시': ts,
+      _template: 'table',
+      _captcha: 'false'
+    };
+    fetch('https://formsubmit.co/ajax/phg@wsh.co.kr', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && (d.success === 'true' || d.success === true)){ setMsg('✔ 전송되었습니다. 감사합니다.', true); }
+        else { btn.disabled=false; setMsg('전송 실패: '+((d&&d.message)||'잠시 후 다시 시도')+' — 안되면 [인쇄/PDF 저장] 후 보내주세요.', false); }
+      })
+      .catch(function(){
+        btn.disabled=false;
+        setMsg('전송 실패 — 인터넷 연결을 확인해 주세요. 계속 안되면 [인쇄/PDF 저장] 후 보내주세요.', false);
+      });
+  }
+</script>
+</body>
+</html>

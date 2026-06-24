@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>양액기 모니터링 시스템 업데이트 안내</title>
+<style>
+  :root{ --green:#0f7a45; --green-d:#0b5e35; --ink:#1c2530; --muted:#5b6b7b; --line:#e3e9ee; --amber:#b45309; --amber-bg:#fffbeb; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:"맑은 고딕","Malgun Gothic",system-ui,sans-serif; color:var(--ink); background:#eef2f5; }
+  .wrap{ max-width:720px; margin:0 auto; background:#fff; }
+  .top{ background:linear-gradient(135deg,var(--green-d),var(--green)); color:#fff; padding:30px 34px 26px; }
+  .top .kicker{ font-size:13px; font-weight:700; letter-spacing:1px; opacity:.9; }
+  .top h1{ font-size:26px; margin:6px 0 4px; }
+  .top .sub{ font-size:15px; opacity:.92; }
+  .body{ padding:26px 34px 34px; }
+  h2{ font-size:18px; margin:26px 0 12px; padding-left:11px; border-left:5px solid var(--green); }
+  h2:first-child{ margin-top:0; }
+  p,li{ font-size:15.5px; line-height:1.75; }
+  .item{ display:flex; gap:12px; padding:13px 0; border-bottom:1px dashed var(--line); }
+  .item:last-child{ border-bottom:none; }
+  .ico{ flex:0 0 38px; height:38px; border-radius:10px; background:#eaf6ef; color:var(--green);
+        display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .item b{ display:block; font-size:15.5px; margin-bottom:2px; }
+  .item span{ font-size:14px; color:var(--muted); line-height:1.6; }
+  .warn{ background:var(--amber-bg); border:1px solid #fcd34d; border-radius:12px; padding:16px 18px; margin-top:8px; }
+  .warn .wt{ color:var(--amber); font-weight:800; font-size:15px; margin-bottom:8px; }
+  .warn li{ font-size:14.5px; margin:6px 0; }
+  .tip{ background:#eef6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px 18px; margin-top:14px; font-size:14.5px; }
+  .tip b{ color:#1d4ed8; }
+  .foot{ margin-top:26px; padding-top:18px; border-top:2px solid var(--line); font-size:13px; color:var(--muted); line-height:1.9; }
+  .foot b{ color:var(--ink); }
+  @media print{ body{ background:#fff; } .wrap{ max-width:none; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="kicker">㈜우성하이텍 · 양액기 원격 모니터링</div>
+      <h1>시스템 업데이트 안내</h1>
+      <div class="sub">약 한 달 만의 큰 업데이트 — <b>화면 전면 개편 + 웹·모바일 설정 기능</b> (펌웨어·프로그램·웹 동시 개선)</div>
+    </div>
+
+    <div class="body">
+      <h2>무엇이 달라졌나요?</h2>
+
+      <div class="item">
+        <div class="ico">🎨</div>
+        <div><b>화면 전면 개편 (새 디자인)</b>
+        <span>모니터링 화면을 완전히 새롭게 바꿨습니다. 더 보기 쉽고 직관적인 화면으로, PC·태블릿·스마트폰 어디서나 편하게 보실 수 있습니다. (화면 구성이 달라지므로 사용법을 함께 안내해 드립니다)</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">⚙️</div>
+        <div><b>웹·모바일에서 직접 '설정'까지 가능</b>
+        <span>이전에는 상태 '조회' 위주였지만, 이제는 복합제어 등 설정을 웹·모바일 화면에서 직접 변경할 수 있습니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">🔌</div>
+        <div><b>연결이 더 안정적으로</b>
+        <span>인터넷이 잠깐 끊겼다 돌아올 때 화면이 멈추던 현상을 개선했습니다. 외부(원격) 접속이 더 잘 유지됩니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">📈</div>
+        <div><b>지난 데이터 조회 강화</b>
+        <span>장비(SD카드)에 쌓인 환경·공급 이력을 날짜별로 불러와 조회하고, 엑셀로 내보낼 수 있습니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">🔒</div>
+        <div><b>로그인 보안 강화</b>
+        <span>로그인한 사용자만 화면 접속·제어가 되도록 보안을 강화했습니다.</span></div>
+      </div>
+
+      <h2>📌 세부 개선 (2026년 6월 추가)</h2>
+
+      <div class="item">
+        <div class="ico">🕒</div>
+        <div><b>마지막 양액공급시각 표시 (신규)</b>
+        <span>메인 화면에서 “마지막으로 양액을 언제 공급했는지”를 바로 확인할 수 있습니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">💧</div>
+        <div><b>공급량 표시 정상화</b>
+        <span>공급량이 소수점 때문에 이상하게(예: 43.660) 보이던 문제를 고쳐, 정확한 리터(ℓ)로 표시됩니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">📋</div>
+        <div><b>공급내역 전체 표시</b>
+        <span>공급보기에서 앞 며칠치만 보이고 잘리던 문제를 고쳐, 조회한 기간 전체가 모두 표시됩니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">📊</div>
+        <div><b>SD카드 불러오기 시 상태정보 함께 표시</b>
+        <span>SD에서 데이터를 불러올 때 운전방식·관수상태·공급횟수·설정 pH/EC·배액량·온습도·CO₂ 까지 함께 표시됩니다.</span></div>
+      </div>
+
+      <div class="item">
+        <div class="ico">🔄</div>
+        <div><b>옛 형식 데이터도 불러오기 지원</b>
+        <span>예전 방식으로 저장된 공급 데이터도 자동 변환되어 불러와집니다.</span></div>
+      </div>
+
+      <div class="tip">
+        💡 앞으로도 <b>필요하거나 추가됐으면 하는 기능</b>이 있으시면 언제든 <b>문의하기</b> 또는 메일로 보내주세요. 최대한 반영해 개선하겠습니다.
+      </div>
+
+      <h2>사용하실 때 꼭 알아두세요</h2>
+      <div class="warn">
+        <div class="wt">⚠️ 원격 화면은 "보조 수단"입니다</div>
+        <ul>
+          <li>인터넷 상태에 따라 원격 화면의 값이 <b>수 초~수 분 늦게</b> 보일 수 있습니다. <b>급수 중단·경보 대응 등 중요한 판단은 반드시 현장에서 한 번 더 확인</b>하세요.</li>
+          <li>뷰어에서 바꾼 <b>설정·운전 명령은 실제 장비에 즉시 적용</b>됩니다. 특히 밖에서(원격) 바꿀 때는 현재 작물·관수 상태를 확인한 뒤 신중히 적용하세요.</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        💡 <b>초기 비밀번호(admin / admin)는 설치 직후 반드시 변경</b>해 주세요. 계정·암호는 농가가 직접 관리하며, 회사는 보관하지 않습니다.
+      </div>
+
+      <div class="foot">
+        <b>문의·건의</b> — 웹 화면 <b>사용자 페이지 → 문의하기</b> 또는 아래 연락처로 연락 주세요.<br />
+        <b>㈜우성하이텍</b> · 경남 양산시 동면 양산대로 446<br />
+        TEL <b>055.365.8801</b> · FAX 055.365.8333<br />
+        <span style="opacity:.8;">필요 환경: <b>Windows 10 이상</b> PC (Windows 7/8 미지원) · 업데이트 적용일: 2026년 6월</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
